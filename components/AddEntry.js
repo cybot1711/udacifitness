@@ -10,6 +10,8 @@ import { submitEntry, removeEntry } from '../utils/api';
 import { connect } from 'react-redux';
 import { addEntry } from '../actions';
 import { white, purple } from '../utils/colors';
+import { NavigationActions } from 'react-navigation';
+
 
 const SubmitBtn = ({ onPress }) =>
   <TouchableOpacity
@@ -61,9 +63,7 @@ class AddEntry extends Component {
   submit = () => {
     const key = timeToString();
     const entry = this.state;
-
     this.props.dispatch(addEntry({ [key]: entry }));
-
     this.setState(() => ({
       run: 0,
       bike: 0,
@@ -71,26 +71,27 @@ class AddEntry extends Component {
       sleep: 0,
       eat: 0,
     }));
-    // Update Redux
-
-    // Navigate to home
-
-    // Save to DB
+    this.toHome();
     submitEntry({ entry, key });
-    // Clear local notification
   };
 
   reset = () => {
     const key = timeToString();
     this.props.dispatch(addEntry({ [key]: getDailyReminderValues() }));
+    this.toHome();
     removeEntry(key);
   };
 
+  toHome = () => {
+    this.props.navigation.dispatch(NavigationActions.back({
+      key: 'AddEntry',
+    }))
+  };
+
+
   render() {
-    console.log(typeof this.props.alreadyLogged);
     const metaInfo = getMetricMetaInfo();
     const date = new Date().toLocaleDateString();
-
     if (this.props.alreadyLogged) {
       return (
         <View style={styles.center}>
@@ -187,4 +188,4 @@ const mapStateToProps = state => {
   }
 };
 
-export default connect(mapStateToProps)(AddEntry)
+export default connect(mapStateToProps)(AddEntry);
